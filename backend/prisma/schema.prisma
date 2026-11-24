@@ -1,0 +1,64 @@
+// ReachInbox Email Scheduler Prisma Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EmailStatus {
+  SCHEDULED
+  PROCESSING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum EmailEventType {
+  CREATED
+  QUEUED
+  PROCESSING
+  SENT
+  FAILED
+  REQUEUED
+  CANCELLED
+}
+
+model Email {
+  id                 String       @id @default(uuid()) @db.Uuid
+  fromEmail          String       @map("from_email")
+  toEmail            String       @map("to_email")
+  subject            String
+  body               String       @db.Text
+  scheduledAt        DateTime     @map("scheduled_at") @db.Timestamptz
+  status             EmailStatus  @default(SCHEDULED)
+  queueJobId         String?      @map("queue_job_id")
+  sentAt             DateTime?    @map("sent_at") @db.Timestamptz
+  etherealPreviewUrl String?      @map("ethereal_preview_url") @db.Text
+  lastError          String?      @map("last_error") @db.Text
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  events             EmailEvent[]
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([createdAt])
+  @@map("emails")
+}
+
+model EmailEvent {
+  id        String         @id @default(uuid()) @db.Uuid
+  emailId   String         @map("email_id") @db.Uuid
+  eventType EmailEventType @map("event_type")
+  message   String
+  metadata  Json?
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  email     Email          @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId, createdAt])
+  @@map("email_events")
+}
