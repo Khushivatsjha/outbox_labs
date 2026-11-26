@@ -18,6 +18,9 @@
     "test:coverage": "npm run test:coverage --workspace=backend",
     "lint": "npm run lint --workspaces"
   },
+  "prisma": {
+    "schema": "backend/prisma/schema.prisma"
+  },
   "keywords": [
     "email-scheduler",
     "bullmq",

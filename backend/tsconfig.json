@@ -10,7 +10,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true
+    "declaration": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "../node_modules/@types"
+    ],
+    "types": ["node", "express", "cors", "nodemailer"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests", "prisma"]
